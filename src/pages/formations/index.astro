@@ -1,0 +1,6 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import db from "../../lib/db";
+const rows=db.prepare("SELECT code,name,level,description FROM formations ORDER BY code").all();
+---
+<Layout title="Formation"><h1>Formations</h1><table><thead><tr><th>Code</th><th>Nom</th><th>Niveau</th><th>Description</th></tr></thead><tbody>{rows.map(c=><tr><td>{c.code}</td><td>{c.name}</td><td>{c.level}</td><td>{c.description}</td></tr>)}</tbody></table></Layout>

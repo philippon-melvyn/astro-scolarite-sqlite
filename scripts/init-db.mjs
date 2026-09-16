@@ -1,0 +1,7 @@
+import Database from "better-sqlite3"; import {mkdirSync} from "node:fs"; import {dirname,resolve} from "node:path";
+const p=resolve(process.env.SQLITE_DB_PATH||"./data/scolarite.db"); mkdirSync(dirname(p),{recursive:true}); const db=new Database(p); db.pragma("foreign_keys=ON");
+db.exec(`CREATE TABLE IF NOT EXISTS formations(id INTEGER PRIMARY KEY AUTOINCREMENT,code TEXT NOT NULL UNIQUE,name TEXT NOT NULL,level TEXT NOT NULL,description TEXT NOT NULL DEFAULT '');
+CREATE TABLE IF NOT EXISTS students(id INTEGER PRIMARY KEY AUTOINCREMENT,student_number TEXT NOT NULL UNIQUE,first_name TEXT NOT NULL,last_name TEXT NOT NULL,email TEXT NOT NULL UNIQUE,birth_date TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS courses(id INTEGER PRIMARY KEY AUTOINCREMENT,code TEXT NOT NULL UNIQUE,name TEXT NOT NULL,semester INTEGER NOT NULL CHECK(semester BETWEEN 1 AND 10),formation_id INTEGER NOT NULL,FOREIGN KEY(formation_id) REFERENCES formations(id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS registrations(id INTEGER PRIMARY KEY AUTOINCREMENT,student_id INTEGER NOT NULL,formation_id INTEGER NOT NULL,academic_year TEXT NOT NULL,UNIQUE(student_id,academic_year),FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE,FOREIGN KEY(formation_id) REFERENCES formations(id) ON DELETE CASCADE);`);
+console.log("Base initialisée :",p); db.close();

@@ -1,0 +1,6 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import db from "../../lib/db";
+const rows=db.prepare("SELECT student_number,first_name,last_name,email,birth_date FROM students ORDER BY last_name,first_name").all();
+---
+<Layout title="Étudiants"><h1>Étudiants</h1><table><thead><tr><th>Numéro</th><th>Nom</th><th>Prénom</th><th>Email</th><th>Naissance</th></tr></thead><tbody>{rows.map(s=><tr><td>{s.student_number}</td><td>{s.last_name}</td><td>{s.first_name}</td><td>{s.email}</td><td>{s.birth_date}</td></tr>)}</tbody></table></Layout>

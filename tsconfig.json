@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+      "target": "ES2022",
+      "module": "ESNext",
+      "moduleResolution": "bundler",
+      "resolveJsonModule": true,
+      "allowJs": true,
+      "checkJs": false,
+      "skipLibCheck": true,
+      "strict": false,
+      "forceConsistentCasingInFileNames": true,
+      "esModuleInterop": true,
+      "types": ["astro/client"],
+      "baseUrl": ".",
+      "paths": {
+        "@/*": ["src/*"]
+      }
+    },
+    "include": ["src/**/*.ts", "src/**/*.astro", "src/**/*.js"],
+    "exclude": ["node_modules", "dist", ".astro"]
+  }

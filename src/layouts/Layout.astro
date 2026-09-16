@@ -1,0 +1,6 @@
+---
+import "../styles/global.css";
+const { title="Scolarité" } = Astro.props;
+---
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>{title} — Scolarité</title></head>
+<body><nav><div class="container"><strong>Scolarité</strong><a href="/">Accueil</a><a href="/students">Étudiants</a><a href="/formations">Formations</a><a href="/courses">Cours</a><a href="/registrations">Inscriptions</a><a href="/teachers">Teachers</a></div></nav><main class="container"><slot /></main></body></html>

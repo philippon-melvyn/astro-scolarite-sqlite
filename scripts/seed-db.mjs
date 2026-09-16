@@ -1,0 +1,10 @@
+import Database from "better-sqlite3"; import {resolve} from "node:path";
+const db=new Database(resolve(process.env.SQLITE_DB_PATH||"./data/monapp.sqlite")); db.pragma("foreign_keys=ON");
+const seed=db.transaction(()=>{const f=db.prepare("INSERT OR IGNORE INTO formations(code,name,level,description) VALUES(?,?,?,?)");
+f.run("BUT-R&T","BUT Réseaux & Télécommunications","BUT","Réseaux, télécommunications et systèmes."); f.run("BUT-MMI","BUT Métiers du Multimédia et de l'Internet","BUT","Développement web et multimédia."); f.run("M-IOT","Master Internet des Objets","Master","Formation spécialisée dans l'Internet des Objets.");
+const gf=db.prepare("SELECT id FROM formations WHERE code=?"),rt=gf.get("BUT-R&T").id,mmi=gf.get("BUT-MMI").id,iot=gf.get("M-IOT").id;
+const s=db.prepare("INSERT OR IGNORE INTO students(student_number,first_name,last_name,email,birth_date) VALUES(?,?,?,?,?)");
+s.run("20260001","Alice","Martin","alice.martin@example.fr","2005-03-14");s.run("20260002","Karim","Bernard","karim.bernard@example.fr","2004-11-02");s.run("20260003","Emma","Petit","emma.petit@example.fr","2003-07-22");s.run("20260004","Lucas","Robert","lucas.robert@example.fr","2005-01-19");s.run("20260005","Sofia","Durand","sofia.durand@example.fr","2004-09-30");
+const c=db.prepare("INSERT OR IGNORE INTO courses(code,name,semester,formation_id) VALUES(?,?,?,?)");c.run("RT101","Réseaux IP",1,rt);c.run("RT205","Réseaux sans fil",2,rt);c.run("MMI101","Développement web",1,mmi);c.run("MMI204","UX et interfaces",2,mmi);c.run("IOT101","Architecture IoT",1,iot);c.run("IOT202","Optimisation des réseaux IoT",2,iot);
+const gs=db.prepare("SELECT id FROM students WHERE student_number=?"),r=db.prepare("INSERT OR IGNORE INTO registrations(student_id,formation_id,academic_year) VALUES(?,?,?)");
+r.run(gs.get("20260001").id,rt,"2026-2027");r.run(gs.get("20260002").id,rt,"2026-2027");r.run(gs.get("20260003").id,mmi,"2026-2027");r.run(gs.get("20260004").id,mmi,"2026-2027");r.run(gs.get("20260005").id,iot,"2026-2027");}); seed(); console.log("Données de démonstration insérées."); db.close();

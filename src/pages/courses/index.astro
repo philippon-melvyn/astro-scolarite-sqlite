@@ -1,0 +1,6 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import db from "../../lib/db";
+const rows=db.prepare("SELECT c.code,c.name,c.semester,f.code formation_code FROM courses c JOIN formations f ON f.id=c.formation_id ORDER BY f.code,c.code").all();
+---
+<Layout title="Cours"><h1>Cours</h1><table><thead><tr><th>Code</th><th>Nom</th><th>Semestre</th><th>Formation</th></tr></thead><tbody>{rows.map(c=><tr><td>{c.code}</td><td>{c.name}</td><td>{c.semester}</td><td>{c.formation_code}</td></tr>)}</tbody></table></Layout>
