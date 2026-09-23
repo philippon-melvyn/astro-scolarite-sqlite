@@ -11,23 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Vérifier les secrets GitHub
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          set -eu
-          for variable in SSH_HOST SSH_USER SSH_PORT SSH_PRIVATE_KEY; do
-            if [ -z "${!variable}" ]; then
-              echo "::error::Secret manquant : $variable"
-              exit 1
-            fi
-            echo "OK : $variable est renseigné"
-          done
-
-      - name: Tester SSH et déployer sur Ubuntu
+      - name: Deploy on Ubuntu server
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -35,80 +19,32 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            set -eu
+            set -e
 
-            etape() {
-              printf '\n===== %s =====\n' "$1"
-            }
+            echo "======================================"
+            echo "Début du déploiement"
+            echo "======================================"
 
-            erreur() {
-              echo "ECHEC : $1"
-              exit 1
-            }
+            cd /var/www/scolarite/astro-scolarite-sqlite
 
-            etape "1. Connexion SSH"
-            echo "OK : connexion au VPS réussie"
-            whoami
+            echo "Mise à jour du code..."
+            git pull origin
 
-            etape "2. Dossier de l'application"
-            cd /var/www/scolarite/astro-scolarite-sqlite \
-              || erreur "Dossier introuvable ou inaccessible"
-            test -w . \
-              || erreur "L'utilisateur ne peut pas écrire dans le dossier"
-            echo "OK : dossier accessible en écriture"
+            echo "Installation des dépendances..."
+            /home/etudiant/.bun/bin/bun ci
 
-            etape "3. Git"
-            command -v git >/dev/null 2>&1 \
-              || erreur "Git est introuvable"
-            git --version
-            git rev-parse --is-inside-work-tree \
-              || erreur "Ce dossier n'est pas un dépôt Git"
+            echo "Compilation Astro..."
+            /home/etudiant/.bun/bin/bun run --bun build
 
-            etape "4. Bun dans la session SSH GitHub Actions"
-            command -v bun >/dev/null 2>&1 \
-              || erreur "Bun est introuvable dans le PATH de cette session SSH"
-            bun --version
+            echo "Redémarrage de l'application..."
+            sudo systemctl restart scolarite
 
-            etape "5. Accès au dépôt GitHub"
-            GIT_TERMINAL_PROMPT=0 git ls-remote origin HEAD >/dev/null \
-              || erreur "Le VPS ne peut pas accéder au dépôt GitHub"
-            echo "OK : dépôt GitHub accessible"
+            echo "Vérification du service..."
+            sudo systemctl status scolarite
 
-            etape "6. Mise à jour du code"
-            GIT_TERMINAL_PROMPT=0 git pull origin \
-              || erreur "git pull origin a échoué"
+            echo "Health check..."
+            curl --fail http://localhost:3000/
 
-            etape "7. Installation des dépendances"
-            bun ci \
-              || erreur "bun ci a échoué"
-
-            etape "8. Compilation Astro"
-            bun run --bun build \
-              || erreur "La compilation Astro a échoué"
-
-            etape "9. Redémarrage du service"
-            sudo -n systemctl restart scolarite \
-              || erreur "Redémarrage refusé ou service scolarite en erreur"
-
-            etape "10. Vérification du service"
-            sudo -n systemctl --no-pager status scolarite \
-              || erreur "Le service scolarite n'est pas actif ou son statut est inaccessible"
-
-            etape "11. Vérification HTTP"
-            command -v curl >/dev/null 2>&1 \
-              || erreur "curl est introuvable"
-
-            tentative=1
-            until curl --fail --silent --show-error \
-              --connect-timeout 3 --max-time 5 \
-              --output /dev/null http://localhost:3000/; do
-              if [ "$tentative" -ge 10 ]; then
-                erreur "Le site ne répond pas correctement sur localhost:3000"
-              fi
-              echo "Attente du démarrage : tentative $tentative/10"
-              tentative=$((tentative + 1))
-              sleep 2
-            done
-
-            echo "OK : le site répond"
-            echo "===== Déploiement terminé ====="
+            echo "======================================"
+            echo "Déploiement terminé"
+            echo "======================================"
