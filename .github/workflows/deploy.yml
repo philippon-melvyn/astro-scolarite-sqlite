@@ -31,10 +31,10 @@ jobs:
             git pull origin
 
             echo "Installation des dépendances..."
-            bun ci
+            /home/etudiant/.bun/bin/bun ci
 
             echo "Compilation Astro..."
-            bun run --bun build
+            /home/etudiant/.bun/bin/bun run --bun build
 
             echo "Redémarrage de l'application..."
             sudo systemctl restart scolarite
@@ -43,7 +43,7 @@ jobs:
             sudo systemctl status scolarite
 
             echo "Health check..."
-            curl --fail http://localhost:3000/
+            curl --fail --retry 10 --retry-connrefused --retry-delay 2 --max-time 5 http://localhost:3000/
 
             echo "======================================"
             echo "Déploiement terminé"
