@@ -9,7 +9,7 @@ const teachers=db.prepare("SELECT COUNT(*) count FROM teachers").get();
 ---
 <Layout title="Accueil"><h1>Gestion de la scolarité</h1><p>AstroJS SSR + SQLite.</p><div class="grid">
 <a class="card" href="/formations"><h2>Formations</h2><strong>{formations.count}</strong></a>
-<a class="card" href="/courses"><h2>de caca qui pu forCours</h2><strong>{courses.count}</strong></a>
+<a class="card" href="/courses"><h2>Développement Web</h2><strong>{courses.count}</strong></a>
 <a class="card" href="/registrations"><h2>Inscriptions</h2><strong>{registrations.count}</strong></a>
 <a class="card" href="/teachers"><h2>Teachers</h2><strong>{teachers.count}</strong></a>
 </div></Layout>
