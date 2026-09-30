@@ -3,4 +3,34 @@ import "../styles/global.css";
 const { title="Déploiement automatique" } = Astro.props;
 ---
 <html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>{title} — Scolarité</title></head>
-<body><nav><div class="container"><strong>Scolarité</strong><a href="/">Accueil</a><a href="/students">Étudiants</a><a href="/formations">Formations</a><a href="/courses">Cours</a><a href="/registrations">Inscriptions</a><a href="/teachers">Teachers</a></div></nav><main class="container"><slot /></main></body></html>
+<body><nav><div class="container"><strong>Scolarité</strong><a href="/">Accueil</a><a href="/students">Étudiants</a><a href="/formations">Formations</a><a href="/courses">Cours</a><a href="/registrations">Inscriptions</a><a href="/teachers">Teachers</a>
+  {Astro.locals.isAuthenticated && <div class="logout"><button id="logout-button" type="button">Déconnexion</button><span id="logout-error" role="alert"></span></div>}
+</div></nav><main class="container"><slot /></main>
+<script>
+  import { signOut } from 'auth-astro/client';
+
+  const button = document.querySelector<HTMLButtonElement>('#logout-button');
+  const error = document.querySelector<HTMLElement>('#logout-error');
+  button?.addEventListener('click', async () => {
+    button.disabled = true;
+    button.textContent = 'Déconnexion…';
+    if (error) error.textContent = '';
+    try {
+      await signOut({ callbackUrl: '/login' });
+    } catch {
+      if (error) error.textContent = 'Déconnexion impossible. Réessaie dans un instant.';
+      button.disabled = false;
+      button.textContent = 'Déconnexion';
+    }
+  });
+</script>
+<style>
+  nav .container { flex-wrap: wrap; }
+  .logout { margin-left: auto; }
+  .logout button { padding: 10px 16px; border: 1px solid currentColor; border-radius: 6px; background: transparent; color: white; font: inherit; cursor: pointer; }
+  .logout button:hover { background: #ffffff20; }
+  .logout button:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+  .logout button:disabled { opacity: .6; cursor: wait; }
+  #logout-error { display: block; max-width: 260px; font-size: .85rem; }
+</style>
+</body></html>

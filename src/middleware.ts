@@ -14,6 +14,7 @@ export async function onRequest(context: any, next: any) {
       return context.redirect('/login');
     }
 
+    context.locals.isAuthenticated = true;
     return next();
   } catch (error) {
     console.error('Erreur de session:', error);
