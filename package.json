@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@astrojs/node": "^11.1.5",
-    "astro": "^7.3.2"
+    "@auth/core": "^0.41.3",
+    "astro": "^7.3.2",
+    "auth-astro": "^4.2.0"
   }
 }

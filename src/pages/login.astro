@@ -1,0 +1,20 @@
+---
+// src/pages/login.astro
+import SignIn  from '../../node_modules/auth-astro/src/components/SignIn.astro';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Connexion">
+  <div class="flex min-h-screen items-center justify-center">
+    <div class="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-md">
+      <h1 class="mb-6 text-center text-2xl font-bold">Connexion</h1>
+      
+      <SignIn 
+        provider="google" 
+        class="flex w-full items-center justify-center rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      >
+        Se connecter avec Google
+      </SignIn>
+    </div>
+  </div>
+</Layout>
